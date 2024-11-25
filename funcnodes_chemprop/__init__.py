@@ -121,7 +121,7 @@ class TrainNode(fn.Node):
 
     trained_model = fn.NodeOutput(uuid="trained_model", type=models.MPNN)
     results = fn.NodeOutput(uuid="results", type=dict)
-    metrics = fn.NodeOutput(uuid="metrics", type=List[dict])
+    metrics = fn.NodeOutput(uuid="metrics", type=pd.DataFrame)
 
     async def func(self, model, train_loader, val_loader, test_loader, max_epochs):
         model_copy = copy.deepcopy(model)
@@ -134,7 +134,7 @@ class TrainNode(fn.Node):
             last_published = 0
             while running:
                 if len(collected_metrics) > last_published:
-                    self.outputs["metrics"].value = collected_metrics
+                    self.outputs["metrics"].value = pd.DataFrame(collected_metrics)
                     last_published = len(collected_metrics)
                 await asyncio.sleep(1)
 
