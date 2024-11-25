@@ -20,8 +20,8 @@ def make_model(scaler: StandardScaler) -> models.MPNN:
     ffn = nn.RegressionFFN(output_transform=output_transform)
     batch_norm = True
     metric_list = [
-        nn.metrics.RMSEMetric(),
-        nn.metrics.MAEMetric(),
+        nn.metrics.RMSE(),
+        nn.metrics.MAE(),
     ]  # Only the first metric is used for training and early stopping
     mpnn = models.MPNN(mp, agg, ffn, batch_norm, metric_list)
     return mpnn
@@ -54,15 +54,15 @@ def make_data(
     train_data, val_data, test_data = data.split_data_by_indices(
         all_data, train_indices, val_indices, test_indices
     )
-
+    print(train_data)
     featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
-    train_dset = data.MoleculeDataset(train_data, featurizer)
+    train_dset = data.MoleculeDataset(train_data[0], featurizer)
     scaler = train_dset.normalize_targets()
 
-    val_dset = data.MoleculeDataset(val_data, featurizer)
+    val_dset = data.MoleculeDataset(val_data[0], featurizer)
     val_dset.normalize_targets(scaler)
 
-    test_dset = data.MoleculeDataset(test_data, featurizer)
+    test_dset = data.MoleculeDataset(test_data[0], featurizer)
 
     train_loader = data.build_dataloader(train_dset, num_workers=num_workers)
 
